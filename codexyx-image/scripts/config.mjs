@@ -4,7 +4,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 
 /** 公司 AI 网关：生图、改图等模型调用 */
-export const DEFAULT_API_BASE_URL = 'https://aiapi.yxrobot.com/v1';
+export const DEFAULT_API_BASE_URL = 'https://token.yxrobot.com/v1';
 
 /** Codex 客户端的 .env，只读复用 YXROBOT_API_KEY（绝不写入） */
 const CODEX_ENV_FILE = join(homedir(), '.codex', '.env');
@@ -61,7 +61,7 @@ function trimUrl(value) {
 /**
  * 解析配置。
  * @returns {{ apiKey: string|null, apiBaseUrl: string, source: string }}
- *   apiBaseUrl 生图等模型调用用（https://aiapi.yxrobot.com/v1）
+ *   apiBaseUrl 生图等模型调用用（https://token.yxrobot.com/v1）
  */
 export function resolveConfig() {
   const codexEnv = readCodexEnvFallback();

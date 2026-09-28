@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { realpathSync } from 'node:fs';
 import { resolveConfig, maskKey } from './config.mjs';
 
-const TIMEOUT_MS = 120_000;          // 生图比普通查询慢得多
+const TIMEOUT_MS = 180_000;          // 慢模型常要 60–90 秒；前面的代理可能更早断开
 const DEFAULT_MODEL = 'openai/gpt-image-2.5-sunburst';
 const DEFAULT_SIZE = '1024x1024';
 
@@ -155,6 +155,12 @@ async function callApi(url, init, apiKey) {
   }
 
   const rawText = await response.text();
+  if (response.status === 524) {
+    runtimeError(
+      '代理超时（HTTP 524）。图片还在生成，连接就被前面的代理断开了。网关后台可能仍显示成功并计费。',
+      '多半是打到了 aiapi.yxrobot.com（前面有阿里云 ESA，约 30 秒断开）。请改用 https://token.yxrobot.com/v1。',
+    );
+  }
   if (!response.ok) reportApiError(response.status, rawText);
 
   let body;
@@ -304,7 +310,7 @@ const USAGE = `公司 AI 网关图片生成 / 编辑
   --mask <path>      edit 模式的掩码 PNG，透明区域表示要重绘的位置
 
 配置：读取 YXROBOT_API_KEY，或 ~/.codex/.env 里的 YXROBOT_API_KEY。
-接口：默认 https://aiapi.yxrobot.com/v1，可用 YXROBOT_API_BASE_URL 覆盖。
+接口：默认 https://token.yxrobot.com/v1，可用 YXROBOT_API_BASE_URL 覆盖。
 注意：默认模型会花钱。免费模型只有 inclusionai/ming-image-0.1-design 和
 inclusionai/ming-image-0.1-design-layer。请勿擅自批量生成。`;
 

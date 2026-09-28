@@ -5,7 +5,7 @@
 | 项目 | 内容 |
 |---|---|
 | 技能名 | `codexyx-image` |
-| 接口 | `https://aiapi.yxrobot.com/v1` |
+| 接口 | `https://token.yxrobot.com/v1` |
 | 能力 | 文生图、改图、局部重绘 |
 | 默认模型 | `openai/gpt-image-2.5-sunburst`（会计费） |
 | 免费模型 | `inclusionai/ming-image-0.1-design`、`inclusionai/ming-image-0.1-design-layer` |
@@ -94,7 +94,7 @@ test -f ~/.agents/skills/codexyx-image/SKILL.md && echo "安装完成"
 YXROBOT_API_KEY=sk-在这里填你的密钥
 ```
 
-然后执行 `chmod 600 ~/.codex/.env`。不要把密钥截图或发到公开的地方。接口默认是 `https://aiapi.yxrobot.com/v1`，一般不用改。
+然后执行 `chmod 600 ~/.codex/.env`。不要把密钥截图或发到公开的地方。接口默认是 `https://token.yxrobot.com/v1`，一般不用改。
 
 ## 重启后试用
 
@@ -108,12 +108,15 @@ YXROBOT_API_KEY=sk-在这里填你的密钥
 把这张图的背景换成下雪的雪山
 ```
 
-默认模型 `openai/gpt-image-2.5-sunburst` 按次计费。只有明确说免费或省钱时，才改用：
-
-- `inclusionai/ming-image-0.1-design`
-- `inclusionai/ming-image-0.1-design-layer`
+默认模型 `openai/gpt-image-2.5-sunburst` 按次计费，通常要 60–90 秒。只有明确说免费或省钱时，才改用 `inclusionai/ming-image-0.1-design`。
 
 想看当前网关里有哪些图片模型，可以说「列出可用的图片模型」。
+
+接口必须用 `https://token.yxrobot.com/v1`。不要改成 `https://aiapi.yxrobot.com/v1`：那个域名前面有阿里云 ESA，回源超时默认 30 秒。`gpt-image-2.5-sunburst` 往往要 60–90 秒，会被掐成 HTTP 524，网关日志里却可能已经成功并计费。`token.yxrobot.com` 前面是 nginx，慢模型可以等到出图。
+
+图片接口目前不支持流式。请求里带 `stream: true` 会直接返回 `OpenAI Images stream is not supported`。
+
+不带 `openai/` 前缀的 `gpt-image-2`、`gpt-image-1` 当前没有可用渠道。在线的相近模型是 `openai/gpt-image-2` 和 `openai/gpt-image-1.5`。`inclusionai/ming-image-0.1-design-layer` 虽然在模型列表里，但不接受文生图接口。
 
 Codex 沙盒如果是只读、不允许联网，生图会失败。生图前把权限开到可以访问网络。
 
