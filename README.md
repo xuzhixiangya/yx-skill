@@ -8,7 +8,7 @@
 | 接口 | `https://token.yxrobot.com/v1` |
 | 能力 | 文生图、改图、局部重绘 |
 | 默认模型 | `openai/gpt-image-2.5-sunburst`（会计费） |
-| 免费模型 | `inclusionai/ming-image-0.1-design`、`inclusionai/ming-image-0.1-design-layer` |
+| 免费模型 | `inclusionai/ming-image-0.1-design`（`design-layer` 不接受文生图接口） |
 | 密钥 | `YXROBOT_API_KEY`，或 `~/.codex/.env` 里的同名项 |
 
 需要 Node.js 20 或更新版本，不用安装别的依赖。
