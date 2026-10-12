@@ -1,6 +1,6 @@
 ---
 name: codexyx-image
-description: 用公司 AI 网关（https://token.yxrobot.com/v1）的图像接口生成或编辑图片。当用户说"生成图片/画一张图/文生图/做张配图/帮我画/搞个图/生成个 logo/create an image/generate image"，或"改图/图生图/编辑这张图/换背景/给图片加点东西/局部重绘/edit image"时使用本技能。它读取 YXROBOT_API_KEY 或 ~/.codex/.env，用 node 脚本调接口，Base64 结果自动解码落地、URL 结果自动下载。无需安装任何依赖。只要用户提到生成图片、画图、改图、图像编辑，也应优先考虑本技能。
+description: 用公司 AI 网关（https://aiapi.yxrobot.com/v1）的图像接口生成或编辑图片。当用户说"生成图片/画一张图/文生图/做张配图/帮我画/搞个图/生成个 logo/create an image/generate image"，或"改图/图生图/编辑这张图/换背景/给图片加点东西/局部重绘/edit image"时使用本技能。它读取 YXROBOT_API_KEY 或 ~/.codex/.env，用 node 脚本调接口，Base64 结果自动解码落地、URL 结果自动下载。无需安装任何依赖。只要用户提到生成图片、画图、改图、图像编辑，也应优先考虑本技能。
 allowed-tools: Bash(node *)
 ---
 
@@ -109,7 +109,7 @@ node "$(ls -d ~/.agents/skills/codexyx-image ~/.claude/skills/codexyx-image 2>/d
 - **`/images/variations` 上游未实现**，不要尝试调用这个端点
 - 返回 `b64_json` 时脚本自动解码落地；返回 `url` 时立即下载（URL 通常有有效期）
 - 图片接口目前不能流式。带上 `stream: true` 时，网关直接返回 `OpenAI Images stream is not supported`
-- 接口走 `https://token.yxrobot.com/v1`，前面是 nginx，慢模型可以等到出图。不要改回 `https://aiapi.yxrobot.com/v1`，那个域名前面有阿里云 ESA，回源超时默认 30 秒，生图超过这个时间会被掐成 HTTP 524，网关日志里却可能已经成功并计费
+- 接口走 `https://aiapi.yxrobot.com/v1`。前面有阿里云 ESA，回源超时已调到 300 秒。单次请求超过 300 秒仍会返回 HTTP 524，网关后台可能已经成功并计费
 
 ## 配置
 
@@ -120,7 +120,7 @@ node "$(ls -d ~/.agents/skills/codexyx-image ~/.claude/skills/codexyx-image 2>/d
 
 **如果脚本报「未找到公司 AI 网关 API Key」**，引导用户设置 `export YXROBOT_API_KEY=sk-xxx`，或写入 `~/.codex/.env`。Key 需用户自行配置，**不要编造**。脚本所有输出只显示掩码后的 Key。
 
-接口地址默认 `https://token.yxrobot.com/v1`，可用 `YXROBOT_API_BASE_URL` 覆盖。
+接口地址默认 `https://aiapi.yxrobot.com/v1`，可用 `YXROBOT_API_BASE_URL` 覆盖。
 
 ## 常见错误
 
@@ -131,7 +131,7 @@ node "$(ls -d ~/.agents/skills/codexyx-image ~/.claude/skills/codexyx-image 2>/d
 | `无效的令牌`               | Key 错了或已轮换，让用户重新配置                          |
 | 余额 / 额度不足             | 转述服务端原话                                     |
 | `图片不存在` / `掩码文件不存在`   | 路径错了，确认文件真实存在                               |
-| HTTP 524              | 请求打到了带 ESA 的 aiapi.yxrobot.com。改用 https://token.yxrobot.com/v1 |
+| HTTP 524              | ESA 回源超时把连接断开了。确认 aiapi.yxrobot.com 的回源规则仍是 300 秒，且这次生成没超过 300 秒。先不要立刻重试，后台可能已经成功并计费 |
 
 
 退出码：`2` = 用法或配置错误，`1` = 运行时或接口错误。

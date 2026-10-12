@@ -158,7 +158,7 @@ async function callApi(url, init, apiKey) {
   if (response.status === 524) {
     runtimeError(
       '代理超时（HTTP 524）。图片还在生成，连接就被前面的代理断开了。网关后台可能仍显示成功并计费。',
-      '多半是打到了 aiapi.yxrobot.com（前面有阿里云 ESA，约 30 秒断开）。请改用 https://token.yxrobot.com/v1。',
+      'aiapi.yxrobot.com 前面的阿里云 ESA 把连接断开了。回源超时应为 300 秒；若仍出现 524，检查回源规则是否生效，或这次生成是否超过 300 秒。先不要立刻重试，后台可能已经成功并计费。',
     );
   }
   if (!response.ok) reportApiError(response.status, rawText);
@@ -310,7 +310,7 @@ const USAGE = `公司 AI 网关图片生成 / 编辑
   --mask <path>      edit 模式的掩码 PNG，透明区域表示要重绘的位置
 
 配置：读取 YXROBOT_API_KEY，或 ~/.codex/.env 里的 YXROBOT_API_KEY。
-接口：默认 https://token.yxrobot.com/v1，可用 YXROBOT_API_BASE_URL 覆盖。
+接口：默认 https://aiapi.yxrobot.com/v1，可用 YXROBOT_API_BASE_URL 覆盖。
 注意：默认模型会花钱。免费模型只有 inclusionai/ming-image-0.1-design 和
 inclusionai/ming-image-0.1-design-layer。请勿擅自批量生成。`;
 
